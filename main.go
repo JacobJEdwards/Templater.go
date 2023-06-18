@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
-    arr := templater.Compile("test test tesiajdga {{ test }} asfj")
-    fmt.Println(arr)
+	data := make(map[string]string)
+	data["test"] = "success"
+	arr := templater.Compile("test test tesiajdga {{ test }} asfj", data)
+	fmt.Println(arr)
 }

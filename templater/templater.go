@@ -49,39 +49,34 @@ func parseTemplate(template string) ([]string, error) {
 
 func compileToString(template string, data map[string]string) string {
 	ast := parse(template)
-	var resultArr []string
+	var resultStr strings.Builder
+	resultStr.Grow(len(template))
 
-	for i, item := range ast {
+	for _, item := range ast {
 
 		if ok, _ := regexp.MatchString(`{{\s*([^}]+)\s*}}`, item); ok {
 
-			key := strings.ReplaceAll(ast[i], "{{", "")
+			key := strings.ReplaceAll(item, "{{", "")
 			key = strings.ReplaceAll(key, "}}", "")
 			key = strings.TrimSpace(key)
 
 			replacement, ok := data[key]
 
 			if ok {
-				resultArr = append(resultArr, replacement)
+				resultStr.WriteString(replacement)
 			} else {
-				resultArr = append(resultArr, item)
+				resultStr.WriteString(item)
 			}
 
 		} else {
-			fmt.Println(item)
-
-			resultArr = append(resultArr, item)
+			resultStr.WriteString(item)
 		}
 	}
 
-	joinedArr := strings.Join(resultArr, "")
-
-	return joinedArr
+	return resultStr.String()
 }
 
-func Compile(template string) string {
-	data := make(map[string]string)
-	data["test"] = "success"
+func Compile(template string, data map[string]string) string {
 
 	return compileToString(template, data)
 }
