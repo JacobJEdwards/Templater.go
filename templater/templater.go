@@ -2,7 +2,6 @@ package templater
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 )
