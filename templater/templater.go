@@ -6,14 +6,16 @@ import (
 	"strings"
 )
 
-func parse(template string) []string {
+var matchRegex = regexp.MustCompile(`{{\s*([^}]+)\s*}}`)
+
+func parse(template string) ([]string, error) {
 	ast, err := parseTemplate(template)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return ast
+	return ast, nil
 }
 
 func parseTemplate(template string) ([]string, error) {
@@ -46,15 +48,16 @@ func parseTemplate(template string) ([]string, error) {
 	return arr, nil
 }
 
-func compileToString(template string, data map[string]string) string {
-	ast := parse(template)
+func compileToString(template string, data map[string]string) (string, error) {
+	ast, err := parse(template)
+    if err != nil {
+        return "", err
+    }
 	var resultStr strings.Builder
 	resultStr.Grow(len(template))
 
 	for _, item := range ast {
-
-		if ok, _ := regexp.MatchString(`{{\s*([^}]+)\s*}}`, item); ok {
-
+        if ok := matchRegex.MatchString(item); ok {
 			key := strings.ReplaceAll(item, "{{", "")
 			key = strings.ReplaceAll(key, "}}", "")
 			key = strings.TrimSpace(key)
@@ -72,10 +75,9 @@ func compileToString(template string, data map[string]string) string {
 		}
 	}
 
-	return resultStr.String()
+	return resultStr.String(), nil
 }
 
-func Compile(template string, data map[string]string) string {
-
+func Compile(template string, data map[string]string) (string, error) {
 	return compileToString(template, data)
 }
